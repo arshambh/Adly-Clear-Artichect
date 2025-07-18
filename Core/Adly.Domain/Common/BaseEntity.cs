@@ -7,14 +7,14 @@ public interface IEntity
 {
 
      DateTime CreateDate { get; set; }
-     DateTime ModifiedDate { get; set; }
+     DateTime? ModifiedDate { get; set; }
 
 }
 
 public class BaseEntity<TKey>: IEntity
 {
     public DateTime CreateDate { get; set; }
-    public DateTime ModifiedDate { get; set; }
+    public DateTime? ModifiedDate { get; set; }
 
     public TKey Id { get; protected set; }
 

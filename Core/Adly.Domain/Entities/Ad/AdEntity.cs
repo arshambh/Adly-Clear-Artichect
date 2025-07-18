@@ -6,7 +6,7 @@ using Ardalis.GuardClauses;
 
 namespace Adly.Domain.Entities.Ad;
 
-public class AdEntity : BaseEntity<Guid>
+public sealed class AdEntity : BaseEntity<Guid>
 {
     private readonly List<ImageValueObjects> _images = new();
     private readonly List<LogValueObject> _changeLog = new();
