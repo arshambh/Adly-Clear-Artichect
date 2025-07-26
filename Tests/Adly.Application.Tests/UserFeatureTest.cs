@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Adly.Application.Common;
 using Adly.Application.Contracts.User;
 using Adly.Application.Contracts.User.Models;
+using Adly.Application.Feature.Common;
 using Adly.Application.Feature.User.Commands.Register;
 using Adly.Application.Feature.User.Queries.PasswordLogin;
 using Adly.Application.Tests.Extensions;
@@ -77,7 +79,13 @@ namespace Adly.Application.Tests
 
             // Act
             var userRegisterCommandHandler = new RegisterUserCommandHandler(userManager);
-            var userRegisterResult = await userRegisterCommandHandler.Handle(registerUserRequest, default);
+
+            var validationBehavior =
+                new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(
+                    new RegisterUserCommandValidator());
+
+
+            var userRegisterResult = await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
 
 
             // Assert
@@ -110,7 +118,12 @@ namespace Adly.Application.Tests
 
             // Act
             var userRegisterCommandHandler = new RegisterUserCommandHandler(userManager);
-            var userRegisterResult = await userRegisterCommandHandler.Handle(registerUserRequest, default);
+            var validationBehavior =
+                new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(
+                    new RegisterUserCommandValidator());
+
+            var userRegisterResult =
+                await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
 
 
             // Assert
@@ -266,6 +279,47 @@ namespace Adly.Application.Tests
 
             testOutputHelper.WritelineOperationResultErrors(loginResult);
 
+        }
+
+        [Fact]
+        public async Task Login_User_Inputs_Should_Be_Valid()
+        {
+            // Arrenge
+            var faker = new Faker();
+            var password = Guid.NewGuid().ToString("N");
+
+            var loginQuery = new UserPasswordLoginQuery(faker.Person.Email, string.Empty);
+
+            var userEntity = new UserEntity(faker.Person.FirstName, faker.Person.LastName, faker.Person.UserName,
+                faker.Person.Email);
+
+
+
+            var userManager = NSubstitute.Substitute.For<IUserManager>();
+            userManager.GetUserByEmailAsync(loginQuery.UsernameOrEmail, CancellationToken.None)
+                .Returns(Task.FromResult<UserEntity?>(userEntity));
+
+            userManager.ValidatePasswordAsync(userEntity, loginQuery.Password, CancellationToken.None)
+                .Returns(Task.FromResult(IdentityResult.Success));
+
+            var jwtService = NSubstitute.Substitute.For<IJwtService>();
+            jwtService.GenerateTokenAsync(userEntity, default)
+                .Returns(Task.FromResult<JwtAccessTokenModel>(new JwtAccessTokenModel("AccessToken", 3000)));
+
+            // Act
+            var userLoginQueryHandler = new UserPasswordLoginQueryHandler(userManager, jwtService);
+
+            var validationBehavior =
+                new ValidateRequestBehavior<UserPasswordLoginQuery, OperationResult<JwtAccessTokenModel>>(
+                    new UserPasswordLoginQueryValidator());
+
+            var loginResult = await validationBehavior.Handle(loginQuery, CancellationToken.None, userLoginQueryHandler.Handle);
+
+            // Assert
+            loginResult.Result.Should().BeNull();
+            loginResult.IsSuccess.Should().BeFalse();
+
+            testOutputHelper.WritelineOperationResultErrors(loginResult);
         }
 
     }
