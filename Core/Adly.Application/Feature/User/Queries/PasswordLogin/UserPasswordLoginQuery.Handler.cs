@@ -32,6 +32,6 @@ public class UserPasswordLoginQueryHandler(IUserManager userManager,IJwtService 
 
             return OperationResult<JwtAccessTokenModel>.SuccessResult(accessToken);
         }
-        return OperationResult<JwtAccessTokenModel>.FailureResult(loginResult.Errors.ConvertToKetKeyValuePair());
+        return OperationResult<JwtAccessTokenModel>.FailureResult(nameof(UserPasswordLoginQuery.Password),"Incorrect Password");
     }
 }

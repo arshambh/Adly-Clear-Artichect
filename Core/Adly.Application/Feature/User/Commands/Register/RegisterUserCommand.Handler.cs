@@ -6,7 +6,9 @@ using Mediator;
 
 namespace Adly.Application.Feature.User.Commands.Register;
 
-public class RegisterUserCommandHandler(IUserManager userManager, IRequestHandler<RegisterUserCommand, OperationResult<bool>> requestHandlerImplementation) : IRequestHandler<RegisterUserCommand, OperationResult<bool>>
+
+
+public class RegisterUserCommandHandler(IUserManager userManager) : IRequestHandler<RegisterUserCommand, OperationResult<bool>>
 {
 
     public async ValueTask<OperationResult<bool>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -21,8 +23,8 @@ public class RegisterUserCommandHandler(IUserManager userManager, IRequestHandle
         {
             PhoneNumber = request.PhoneNumber
         };
-        var createResult = await userManager.PasswordCreateAsync(user, cancellationToken);
-        if (!createResult.Succeeded)
+        var createResult = await userManager.PasswordCreateAsync(user, request.Password, cancellationToken);
+        if (createResult.Succeeded)
             return OperationResult<bool>.SuccessResult(true);
 
 

@@ -5,7 +5,7 @@ namespace Adly.Application.Contracts.User;
 
 public interface IUserManager
 {
-    Task<IdentityResult> PasswordCreateAsync(UserEntity user,CancellationToken cancellationToken);
+    Task<IdentityResult> PasswordCreateAsync(UserEntity user,string password,CancellationToken cancellationToken);
     Task<UserEntity?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken);
     Task<UserEntity?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
 
