@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\Validation\" />
     <Folder Include="Contracts\User\Models\" />
     <Folder Include="Feature\User\Queries\PasswordLogin\" />
   </ItemGroup>

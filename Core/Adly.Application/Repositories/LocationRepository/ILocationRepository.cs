@@ -1,0 +1,14 @@
+﻿using Adly.Domain.Entities.Ad;
+
+namespace Adly.Application.Repositories.LocationRepository;
+
+public interface ILocationRepository
+{
+    Task CreateAsync(LocationEntity locationEntity, CancellationToken cancellationToken = default);
+
+    Task<LocationEntity> GetLocationByIdAsync(Guid locationId,CancellationToken cancellationToken = default);
+
+    Task<List<LocationEntity>> GetLocationByNameAsync(string locationName, CancellationToken cancellationToken = default);
+
+
+}

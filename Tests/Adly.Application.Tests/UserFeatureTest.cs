@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Adly.Application.Common;
 using Adly.Application.Contracts.User;
 using Adly.Application.Contracts.User.Models;
+using Adly.Application.Extensions;
 using Adly.Application.Feature.Common;
 using Adly.Application.Feature.User.Commands.Register;
 using Adly.Application.Feature.User.Queries.PasswordLogin;
@@ -13,15 +14,31 @@ using Adly.Application.Tests.Extensions;
 using Adly.Domain.Entities.User;
 using Bogus;
 using FluentAssertions;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NSubstitute;
 using Xunit.Abstractions;
 
 namespace Adly.Application.Tests
 {
-    public class UserFeatureTest(ITestOutputHelper testOutputHelper)
+    public class UserFeatureTest
     {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public UserFeatureTest(ITestOutputHelper testOutputHelper)
+        {
+            var serviceCollection = new ServiceCollection();
+
+            serviceCollection.RegisterApplicationValidator();
+            _serviceProvider=serviceCollection.BuildServiceProvider();
+
+            _testOutputHelper = testOutputHelper;
+        }
+
+
         [Fact]
         public async Task Creating_New_User_Should_Be_Success()
         {
@@ -81,8 +98,7 @@ namespace Adly.Application.Tests
             var userRegisterCommandHandler = new RegisterUserCommandHandler(userManager);
 
             var validationBehavior =
-                new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(
-                    new RegisterUserCommandValidator());
+                new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(_serviceProvider.GetRequiredService<IValidator<RegisterUserCommand>>());
 
 
             var userRegisterResult = await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
@@ -91,7 +107,7 @@ namespace Adly.Application.Tests
             // Assert
             userRegisterResult.IsSuccess.Should().BeFalse();
 
-            testOutputHelper.WritelineOperationResultErrors(userRegisterResult);
+            _testOutputHelper.WritelineOperationResultErrors(userRegisterResult);
         }
 
 
@@ -120,7 +136,7 @@ namespace Adly.Application.Tests
             var userRegisterCommandHandler = new RegisterUserCommandHandler(userManager);
             var validationBehavior =
                 new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(
-                    new RegisterUserCommandValidator());
+                    _serviceProvider.GetRequiredService<IValidator<RegisterUserCommand>>());
 
             var userRegisterResult =
                 await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
@@ -129,7 +145,7 @@ namespace Adly.Application.Tests
             // Assert
             userRegisterResult.IsSuccess.Should().BeFalse();
 
-            testOutputHelper.WritelineOperationResultErrors(userRegisterResult);
+            _testOutputHelper.WritelineOperationResultErrors(userRegisterResult);
         }
 
         [Fact]
@@ -202,7 +218,7 @@ namespace Adly.Application.Tests
             loginResult.Result.Should().BeNull();
             loginResult.IsSuccess.Should().BeFalse();
 
-            testOutputHelper.WritelineOperationResultErrors(loginResult);
+            _testOutputHelper.WritelineOperationResultErrors(loginResult);
 
         }
 
@@ -277,7 +293,7 @@ namespace Adly.Application.Tests
             loginResult.Result.Should().BeNull();
             loginResult.IsNotFound.Should().BeTrue();
 
-            testOutputHelper.WritelineOperationResultErrors(loginResult);
+            _testOutputHelper.WritelineOperationResultErrors(loginResult);
 
         }
 
@@ -311,7 +327,7 @@ namespace Adly.Application.Tests
 
             var validationBehavior =
                 new ValidateRequestBehavior<UserPasswordLoginQuery, OperationResult<JwtAccessTokenModel>>(
-                    new UserPasswordLoginQueryValidator());
+                    _serviceProvider.GetRequiredService<IValidator<UserPasswordLoginQuery>>());
 
             var loginResult = await validationBehavior.Handle(loginQuery, CancellationToken.None, userLoginQueryHandler.Handle);
 
@@ -319,7 +335,7 @@ namespace Adly.Application.Tests
             loginResult.Result.Should().BeNull();
             loginResult.IsSuccess.Should().BeFalse();
 
-            testOutputHelper.WritelineOperationResultErrors(loginResult);
+            _testOutputHelper.WritelineOperationResultErrors(loginResult);
         }
 
     }
