@@ -12,6 +12,13 @@ public sealed class LocationEntity : BaseEntity<Guid>
 
     public LocationEntity(string name)
     {
+        Id = Guid.NewGuid();
         Name = name;
     }
+
+    private LocationEntity()
+    {
+        
+    }
+
 }

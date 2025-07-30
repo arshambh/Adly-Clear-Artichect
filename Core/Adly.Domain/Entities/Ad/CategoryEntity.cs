@@ -12,7 +12,13 @@ public sealed class CategoryEntity : BaseEntity<Guid>
 
     public CategoryEntity(string name)
     {
+        Id = Guid.NewGuid();
         Name = name;
     }
 
+
+    private CategoryEntity()
+    {
+        
+    }
 }
