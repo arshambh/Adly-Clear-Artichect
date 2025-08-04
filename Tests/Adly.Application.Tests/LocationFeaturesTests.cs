@@ -1,13 +1,15 @@
-﻿using Adly.Application.Common;
+﻿using System.Runtime.CompilerServices;
+using Adly.Application.Common;
 using Adly.Application.Extensions;
 using Adly.Application.Feature.Common;
 using Adly.Application.Feature.Location.Commands;
 using Adly.Application.Feature.Location.Queries;
 using Adly.Application.Feature.User.Commands.Register;
 using Adly.Application.Repositories.Common;
-using Adly.Application.Repositories.LocationRepository;
+using Adly.Application.Repositories.Location;
 using Adly.Application.Tests.Extensions;
 using Adly.Domain.Entities.Ad;
+using Bogus.DataSets;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -173,6 +175,40 @@ public class LocationFeaturesTests
         _testOutputHelper.WritelineOperationResultErrors(getLocationResult);
     }
 
+
+
+ 
+
+    [Fact]
+    public async Task Location_Name_Should_Not_Be_Empty()
+    {
+        // Arrange
+        var emptyLocationName = string.Empty;
+        var location = new CreateLocationCommand(emptyLocationName);
+
+        var locationRepositoryMock = NSubstitute.Substitute.For<ILocationRepository>();
+        locationRepositoryMock.IsLocationExistsAsync(location.LocationName).Returns(Task.FromResult(false));
+
+        var unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
+        unitOfWork.LocationRepository.Returns(locationRepositoryMock);
+
+        var validationBehavior =
+            new ValidateRequestBehavior<CreateLocationCommand, OperationResult<bool>>(
+                _serviceProvider.GetRequiredService<IValidator<CreateLocationCommand>>());
+
+        var createLocationHandler =
+            new CreateLocationCommandHandler(unitOfWork);
+
+        // Act
+        var createLocationResult = await validationBehavior.Handle(
+            location,
+            default,
+            createLocationHandler.Handle);
+
+        // Assert
+        createLocationResult.IsSuccess.Should().BeFalse();
+        _testOutputHelper.WritelineOperationResultErrors(createLocationResult);
+    }
 
 
 

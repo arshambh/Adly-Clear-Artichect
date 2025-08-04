@@ -1,6 +1,6 @@
 ﻿using Adly.Domain.Entities.Ad;
 
-namespace Adly.Application.Repositories.LocationRepository;
+namespace Adly.Application.Repositories.Location;
 
 public interface ILocationRepository
 {
