@@ -45,6 +45,18 @@ public class OperationResult<TResult> : IOperatorResult
         };
     }
 
+    public static OperationResult<TResult> DomainFailureResult(string errorMessage)
+    {
+        return new OperationResult<TResult>()
+        {
+            Result = default,
+            ErrorMessages = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("DomainError", errorMessage)
+            }
+        };
+    }
+
     public static OperationResult<TResult> NotFoundResult(string propertyName, string message)
     {
         var res = new OperationResult<TResult>(){Result = default,IsNotFound = true};

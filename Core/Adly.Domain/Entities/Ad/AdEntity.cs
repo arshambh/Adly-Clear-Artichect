@@ -1,6 +1,7 @@
 ﻿using Adly.Domain.Common;
 using Adly.Domain.Common.ValueObjects;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Ardalis.GuardClauses;
 
@@ -141,4 +142,14 @@ public sealed class AdEntity : BaseEntity<Guid>
         _changeLog.Add(new LogValueObject(DateTime.Now, "Ad Edited"));
         CurrentState = AdState.Pending;
     }
+
+    public void AddImage([NotNull] ImageValueObjects image)
+    {
+        Guard.Against.Null(image, nameof(image));
+        _images.Add(image);
+        _changeLog.Add(new LogValueObject(DateTime.Now, "Ad Image Added"));
+    }
+
+
+
 }

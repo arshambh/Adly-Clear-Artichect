@@ -10,4 +10,6 @@ public interface IUserManager
     Task<UserEntity?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
 
     Task<IdentityResult> ValidatePasswordAsync(UserEntity user,string givenPassword,CancellationToken cancellationToken);
+
+    Task<UserEntity?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken=default);
 }
