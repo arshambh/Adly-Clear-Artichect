@@ -7,6 +7,7 @@ using Adly.Application.Repositories.Ad;
 using Adly.Application.Repositories.Category;
 using Adly.Application.Repositories.Common;
 using Adly.Application.Repositories.Location;
+using Adly.Domain.Common.ValueObjects;
 using Adly.Domain.Entities.Ad;
 using Adly.Domain.Entities.User;
 using FluentAssertions;
@@ -56,6 +57,7 @@ public class AdFeaturesTests
         locationMock.GetLocationByIdAsync(Arg.Any<Guid>())!
             .Returns(Task.FromResult(new LocationEntity("Test Location")));
 
+
         userManagerMock.GetUserByIdAsync(Arg.Any<Guid>())!
             .Returns(Task.FromResult(new UserEntity("Test", "Test", "Test", "Test@Test.com")));
 
@@ -74,7 +76,7 @@ public class AdFeaturesTests
 
         var createAdHandler = new CreateAdCommandHandler(unitOfWorkMock, fileServiceMock, userManagerMock);
 
-        var createAdResult=await Helpers.ValidateAndExecuteAsync(createAdCommand, createAdHandler, _serviceProvider);
+        var createAdResult = await Helpers.ValidateAndExecuteAsync(createAdCommand, createAdHandler, _serviceProvider);
 
         createAdResult.Result.Should().BeTrue();
     }
@@ -83,6 +85,77 @@ public class AdFeaturesTests
 
 
 
+
+    [Fact]
+    public async Task Editing_An_Ad_With_Valid_Parameters_Should_Be_Success()
+    {
+
+        var mockId = Guid.NewGuid();
+        var adEntityMock = AdEntity.Create(mockId, "Test Title", "Test Description", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+
+
+        var mockAdImages = new List<ImageValueObjects>()
+        {
+            new ImageValueObjects("TestFile1.png", "Image/png"),
+            new ImageValueObjects("TestFile2.png", "Image/png"),
+            new ImageValueObjects("TestFile3.png", "Image/png"),
+        };
+        mockAdImages.ForEach(x => adEntityMock.AddImage(x));
+
+        var unitOfWorkMock = NSubstitute.Substitute.For<IUnitOfWork>();
+        var adRepositoryMock = NSubstitute.Substitute.For<IAdRepository>();
+
+        var categoryMock = NSubstitute.Substitute.For<ICategoryRepository>();
+        var locationMock = NSubstitute.Substitute.For<ILocationRepository>();
+        var fileServiceMock = NSubstitute.Substitute.For<IFileService>();
+
+
+
+        categoryMock.GetCategoryByIdAsync(Arg.Any<Guid>())!
+            .Returns(Task.FromResult(new CategoryEntity("Test Category")));
+
+
+        locationMock.GetLocationByIdAsync(Arg.Any<Guid>())!
+            .Returns(Task.FromResult(new LocationEntity("Test Location")));
+
+        adRepositoryMock.GetAdByIdAsync(mockId, default)!.Returns(Task.FromResult(adEntityMock));
+
+
+        fileServiceMock.SaveFilesAsync(Arg.Any<List<SaveFileModel>>())
+            .Returns(Task.FromResult(new List<SaveFileModelResult>()
+            {
+                new ("Test.png", "image/png")
+            }));
+
+        fileServiceMock.RemoveFilesAsync(Arg.Any<string[]>())
+            .Returns(Task.CompletedTask);
+
+        unitOfWorkMock.AdRepository.Returns(adRepositoryMock);
+        unitOfWorkMock.LocationRepository.Returns(locationMock);
+        unitOfWorkMock.CategoryRepository.Returns(categoryMock);
+
+
+
+        var editAdCommand = new EditAdCommand(mockId, Guid.NewGuid(), Guid.NewGuid(),
+            "Edited Title","Edited Description", ["TestFile1.png"],
+            [new EditAdCommand.AddNewImagesModel("Test Image Content","image/png")]);
+
+
+        var editAdCommandHandler = new EditAdCommandHandler(unitOfWorkMock, fileServiceMock);
+
+        var editAdCommandResult = await Helpers.ValidateAndExecuteAsync(editAdCommand, editAdCommandHandler, _serviceProvider);
+
+
+        //Assert
+        editAdCommandResult.Result.Should().BeTrue();
+        adEntityMock.Title.Should().BeEquivalentTo("Edited Title");
+        adEntityMock.Description.Should().BeEquivalentTo("Edited Description"); // Corrected line
+        adEntityMock.Images.Should().NotContain(x => x.FileName.Equals("TestFile1.png"));
+        adEntityMock.Images.Should().HaveCount(3);
+        adEntityMock.Images.Should().Contain(x => x.FileName.Equals("Test.png"));
+
+
+    }
 
 
 }

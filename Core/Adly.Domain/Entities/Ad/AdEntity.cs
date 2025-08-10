@@ -125,19 +125,27 @@ public sealed class AdEntity : BaseEntity<Guid>
     }
 
 
-    public void Edit(string title, string description, Guid? categoryId, Guid? locationId)
+    public void Edit(string? title, string? description, Guid? categoryId, Guid? locationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(title);
-        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        // ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        // ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        //
+        // Guard.Against.NullOrEmpty(categoryId, "Invalid Category ID");
+        // Guard.Against.NullOrEmpty(locationId, "Invalid Location ID");
 
-        Guard.Against.NullOrEmpty(categoryId, "Invalid Category ID");
-        Guard.Against.NullOrEmpty(locationId, "Invalid Location ID");
+        if (!string.IsNullOrWhiteSpace(title))
+            Title = title;
+
+        if (!string.IsNullOrWhiteSpace(description))
+            Description = description;
+
+        if (categoryId.HasValue  && categoryId != Guid.Empty)
+            CategoryId = categoryId.Value;
 
 
-        Title = title;
-        Description = description;
-        CategoryId = categoryId.Value;
-        LocationId = locationId.Value;
+        if (locationId.HasValue && locationId != Guid.Empty)
+            LocationId = locationId.Value;
+
 
         _changeLog.Add(new LogValueObject(DateTime.Now, "Ad Edited"));
         CurrentState = AdState.Pending;
@@ -150,6 +158,9 @@ public sealed class AdEntity : BaseEntity<Guid>
         _changeLog.Add(new LogValueObject(DateTime.Now, "Ad Image Added"));
     }
 
-
+    public void RemoveImage(string[] images)
+    {
+        _images.RemoveAll(x => images.Contains(x.FileName));
+    }
 
 }

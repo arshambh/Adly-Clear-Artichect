@@ -8,5 +8,5 @@ public interface IFileService
 
     Task<GetFileModel[]> GetFilesByNameAsync(string[] fileNames, CancellationToken cancellationToken = default);
 
-
+    Task RemoveFilesAsync(string[] fileNames, CancellationToken cancellationToken = default);
 }

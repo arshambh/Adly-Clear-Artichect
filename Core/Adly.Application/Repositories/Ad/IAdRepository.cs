@@ -6,7 +6,7 @@ public interface IAdRepository
 {
     Task CreateAdAsync(AdEntity adEntity, CancellationToken cancellationToken = default);
 
-    Task<AdEntity> GetAdByIdAsync(Guid adId, CancellationToken cancellationToken = default);
+    Task<AdEntity?> GetAdByIdAsync(Guid adId, CancellationToken cancellationToken = default);
 
     Task<AdEntity[]> GetUserAdsAsync(Guid userId, CancellationToken cancellationToken = default);
 

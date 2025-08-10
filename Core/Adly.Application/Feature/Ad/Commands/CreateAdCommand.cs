@@ -5,7 +5,8 @@ using Mediator;
 
 namespace Adly.Application.Feature.Ad.Commands;
 
-public record CreateAdCommand(Guid UserId, Guid CategoryId, Guid LocationId, string Title, string Description, CreateAdCommand.CreateAdImagesModel[] AdImages):IRequest<OperationResult<bool>>, IValidatableModel<CreateAdCommand>
+public record CreateAdCommand(Guid UserId, Guid CategoryId, Guid LocationId, string Title, string Description, CreateAdCommand.CreateAdImagesModel[] AdImages)
+    :IRequest<OperationResult<bool>>, IValidatableModel<CreateAdCommand>
 {
     public record CreateAdImagesModel(string Base64File, string FileContent);
 
