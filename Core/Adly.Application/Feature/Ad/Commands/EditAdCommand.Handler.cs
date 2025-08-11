@@ -37,7 +37,7 @@ public class EditAdCommandHandler(IUnitOfWork unitOfWork, IFileService fileServi
         if (request.RemovedImageNames.Any())
         {
             ad.RemoveImage(request.RemovedImageNames);
-            await fileService.RemoveFilesAsync(request.RemovedImageNames, cancellationToken);
+            await fileService.RemoveFilesAsync(request.RemovedImageNames.ToList(), cancellationToken);
         }
 
         if (request.NewImages.Any())

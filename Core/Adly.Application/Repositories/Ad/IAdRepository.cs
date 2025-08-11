@@ -8,6 +8,8 @@ public interface IAdRepository
 
     Task<AdEntity?> GetAdByIdAsync(Guid adId, CancellationToken cancellationToken = default);
 
+    Task<AdEntity?> GetAdDetailByIdAsync(Guid adId, CancellationToken cancellationToken = default);
+
     Task<AdEntity[]> GetUserAdsAsync(Guid userId, CancellationToken cancellationToken = default);
 
     Task<AdEntity[]> GetVerifiedAdsAsync(int currentPAge, int pageCount, CancellationToken cancellationToken = default);

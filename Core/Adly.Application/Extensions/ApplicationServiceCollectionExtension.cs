@@ -1,6 +1,8 @@
-﻿using Adly.Application.Common.Validation;
+﻿using Adly.Application.Common.MappingConfigurations;
+using Adly.Application.Common.Validation;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Adly.Application.Extensions;
 
@@ -55,5 +57,15 @@ public static class ApplicationServiceCollectionExtension
         return services;
     }
 
+    public static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
+    {
+        services.AddAutoMapper(cfg => { }, typeof(RegisterApplicationMappers).Assembly);
+        return services;
+    }
+    public static IServiceCollection AddLoggerFactory(this IServiceCollection services)
+    {
+        services.AddLogging();
+        return services;
+    }
 
 }

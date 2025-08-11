@@ -3,6 +3,7 @@ using Adly.Domain.Common.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Adly.Domain.Entities.User;
 using Ardalis.GuardClauses;
 
 namespace Adly.Domain.Entities.Ad;
@@ -22,6 +23,16 @@ public sealed class AdEntity : BaseEntity<Guid>
 
     public Guid CategoryId { get; private set; }
     public Guid LocationId { get; private set; }
+
+
+    #region Navigation
+
+    public UserEntity User { get; private set; }
+    public CategoryEntity Category { get; private set; }
+    public LocationEntity Location { get; private set; }
+
+    #endregion
+
 
     public AdState CurrentState { get; private set; }
 
@@ -90,6 +101,45 @@ public sealed class AdEntity : BaseEntity<Guid>
     }
 
 
+
+
+    public static AdEntity Create(string? title, string? description, UserEntity user, CategoryEntity category, LocationEntity location)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
+        // if (userId == Guid.Empty || userId == null)
+        //     throw new InvalidOperationException("User Id Must Have A Value...");
+        //
+        // if (categoryId == Guid.Empty || categoryId == null)
+        //     throw new InvalidOperationException("Category Id Must Have A Value...");
+
+        Guard.Against.Null(user, "Invalid User");
+        Guard.Against.Null(category, "Invalid Category");
+        Guard.Against.Null(location, "Invalid Location");
+
+
+        var ad = new AdEntity
+        {
+            Id = Guid.NewGuid(),
+            Title = title,
+            Description = description,
+            User = user,
+            UserId = user.Id,
+            Category = category,
+            CategoryId = category.Id,
+            CurrentState = AdState.Pending,
+            Location = location,
+            LocationId = location.Id
+        };
+
+
+        ad._changeLog.Add(new LogValueObject(DateTime.Now, "Ad Created"));
+
+        return ad;
+    }
+
+
     public static AdEntity Create(Guid? id, string? title, string? description, Guid? userId, Guid? categoryId, Guid? locationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
@@ -139,7 +189,7 @@ public sealed class AdEntity : BaseEntity<Guid>
         if (!string.IsNullOrWhiteSpace(description))
             Description = description;
 
-        if (categoryId.HasValue  && categoryId != Guid.Empty)
+        if (categoryId.HasValue && categoryId != Guid.Empty)
             CategoryId = categoryId.Value;
 
 
@@ -163,4 +213,5 @@ public sealed class AdEntity : BaseEntity<Guid>
         _images.RemoveAll(x => images.Contains(x.FileName));
     }
 
+  
 }
