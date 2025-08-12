@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Configurations\Ad\" />
     <Folder Include="Configurations\Location\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
   <ItemGroup>
