@@ -20,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adly.Application.Tests", "Tests\Adly.Application.Tests\Adly.Application.Tests.csproj", "{9EF166A6-E779-45E0-9362-D3A6F9B03CC5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{07118CAB-DB09-45D0-A9C1-629DF5E062C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adly.Infrastructure.Persistence", "Infrastructure\Adly.Infrastructure.Persistence\Adly.Infrastructure.Persistence.csproj", "{DCE4032E-0FC2-4A4F-A1EB-069F560405F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,10 @@ Global
 		{9EF166A6-E779-45E0-9362-D3A6F9B03CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EF166A6-E779-45E0-9362-D3A6F9B03CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EF166A6-E779-45E0-9362-D3A6F9B03CC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCE4032E-0FC2-4A4F-A1EB-069F560405F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCE4032E-0FC2-4A4F-A1EB-069F560405F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCE4032E-0FC2-4A4F-A1EB-069F560405F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCE4032E-0FC2-4A4F-A1EB-069F560405F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +59,7 @@ Global
 		{A7CF5447-C57A-4084-8C11-7A8FE635DB9F} = {BD7EAB0E-19FD-4954-9D3E-390726B513EC}
 		{5B899478-8E8D-4676-BAEE-A77E7BD3D05D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9EF166A6-E779-45E0-9362-D3A6F9B03CC5} = {BD7EAB0E-19FD-4954-9D3E-390726B513EC}
+		{DCE4032E-0FC2-4A4F-A1EB-069F560405F2} = {07118CAB-DB09-45D0-A9C1-629DF5E062C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4279E17-027D-42BE-BFE2-B8CD6B0F29F7}
