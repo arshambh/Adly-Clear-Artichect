@@ -9,11 +9,20 @@ public static class ModelBuilderExtensions
     {
         var entityTypes = assemblies.SelectMany(x => x.ExportedTypes)
             .Where(x => x is { IsClass: true, IsAbstract: false, IsPublic: true } &&
-                        typeof(TEntityType).IsAssignableFrom(x));
+                        typeof(TEntityType).IsAssignableFrom(x) && !x.IsGenericTypeDefinition);
 
         foreach (var entityType in entityTypes)
         {
-            builder.Entity(entityType);
+            try
+            {
+                builder.Entity(entityType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to register entity '{entityType.FullName}'. " +
+                    $"Check for empty names in [Table]/[View]/[Column]/[Index] or ToTable/ToView/etc.", ex);
+            }
         }
 
     }

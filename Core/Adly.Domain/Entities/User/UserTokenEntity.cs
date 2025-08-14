@@ -5,7 +5,7 @@ namespace Adly.Domain.Entities.User;
 
 public class UserTokenEntity:IdentityUserToken<Guid>,IEntity
 {
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
 
 

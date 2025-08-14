@@ -4,11 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Adly.Infrastructure.Persistence.Configurations;
 
-public class AdlyDbContext(DbContextOptions<AdlyDbContext> options) : DbContext(options)
+public class AdlyDbContext : DbContext
 {
+
+    public AdlyDbContext(DbContextOptions<AdlyDbContext> options)
+        : base(options)
+    {
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
         modelBuilder.RegisterEntities<IEntity>(typeof(IEntity).Assembly);
         modelBuilder.ApplyRestrictDeleteBehaviour();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AdlyDbContext).Assembly);
@@ -42,19 +47,17 @@ public class AdlyDbContext(DbContextOptions<AdlyDbContext> options) : DbContext(
 
     private void ApplyEntityChangeDates()
     {
-        var entities = base.ChangeTracker.Entries()
-            .Where(x => x is { Entity: IEntity, State: EntityState.Added } or { Entity: IEntity, State: EntityState.Modified });
-       
+        var entities = base.ChangeTracker
+            .Entries()
+            .Where(c => c is { Entity: IEntity, State: EntityState.Added } or { Entity: IEntity, State: EntityState.Modified });
+
         foreach (var entity in entities)
         {
             if (entity.State == EntityState.Added)
-                ((IEntity)entity.Entity).CreateDate = DateTime.Now;
+                ((IEntity)entity.Entity).CreatedDate = DateTime.Now;
 
-            if (entity.State == EntityState.Modified)
+            else if (entity.State == EntityState.Modified)
                 ((IEntity)entity.Entity).ModifiedDate = DateTime.Now;
-
         }
     }
-
-
 }

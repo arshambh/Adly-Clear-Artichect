@@ -5,7 +5,7 @@ namespace Adly.Domain.Entities.User;
 
 public sealed class RoleEntity : IdentityRole<Guid>, IEntity
 {
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
 
     public string DisplayName { get; private set; }

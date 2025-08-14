@@ -6,7 +6,7 @@ namespace Adly.Domain.Entities.User;
 
 public  sealed class UserEntity : IdentityUser<Guid>, IEntity
 {
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
 
 

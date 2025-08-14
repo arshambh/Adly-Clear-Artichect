@@ -11,7 +11,7 @@ public class GetUserAdsQueryHandler(IUnitOfWork unitOfWork):IRequestHandler<GetU
         var userAds = await unitOfWork.AdRepository.GetUserAdsAsync(request.UserId, cancellationToken);
 
         var result = userAds.Select(x =>
-            new GetUserAdsQueryResult(x.Id, x.Title, x.ModifiedDate ?? x.CreateDate, x.CurrentState)).ToList();
+            new GetUserAdsQueryResult(x.Id, x.Title, x.ModifiedDate ?? x.CreatedDate, x.CurrentState)).ToList();
 
         return OperationResult<List<GetUserAdsQueryResult>>.SuccessResult(result);
     }
