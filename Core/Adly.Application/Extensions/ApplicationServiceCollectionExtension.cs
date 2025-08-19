@@ -10,85 +10,38 @@ public static class ApplicationServiceCollectionExtension
 {
     public static IServiceCollection RegisterApplicationValidator(this IServiceCollection services)
     {
-        // Gather candidate types safely (skip dynamic/proxy assemblies and guard GetExportedTypes)
         var validationTypes = AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(a => !IsSkippableAssembly(a))
-            .SelectMany(SafeGetExportedTypes)
-            .Where(t => t is { IsAbstract: false, IsInterface: false })
-            .Where(t => t.GetInterfaces().Any(i =>
-                i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidatableModel<>)));
+            .Where(a => a is { IsDynamic: false, FullName: not null } &&
+                        !a.FullName.StartsWith("DynamicProxyGenAssembly2")) // فیلتر اسمبلی‌های داینامیک و Castle Proxy
+            .SelectMany(SafeGetExportedTypes) // استفاده از متد امن
+            .Where(x => x.GetInterfaces().Any(m =>
+                m.IsGenericType && m.GetGenericTypeDefinition() == typeof(IValidatableModel<>)));
 
         foreach (var validationType in validationTypes)
         {
-            object? requestModel = null;
+            var biggestConstractorLength = validationType.GetConstructors()
+                .OrderByDescending(x => x.GetParameters().Length).First().GetParameters().Length;
 
-            try
-            {
-                // Use the "widest" ctor, pass nulls (your current approach), but guard against ctor exceptions
-                var widestCtorParamCount = validationType
-                    .GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
-                    .OrderByDescending(c => c.GetParameters().Length)
-                    .FirstOrDefault()?.GetParameters().Length ?? 0;
-
-                requestModel = Activator.CreateInstance(validationType, new object?[widestCtorParamCount]);
-            }
-            catch
-            {
-                // Skip types that cannot be instantiated with null args
-                continue;
-            }
-
+            var requestModel = Activator.CreateInstance(validationType, new object?[biggestConstractorLength]);
             if (requestModel is null) continue;
 
-            // Find the Validate method on IValidatableModel<T>
-            var validateMethod = validationType.GetMethod(nameof(IValidatableModel<object>.Validate),
-                               BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-            if (validateMethod is null) continue;
-
-            object? validationModelBase = null;
-            try
-            {
-                validationModelBase = Activator.CreateInstance(
-                    typeof(ValidationModelBase<>).MakeGenericType(validationType));
-            }
-            catch
-            {
-                continue;
-            }
-
+            var requestMethodInfo = validationType.GetMethod(nameof(IValidatableModel<object>.Validate));
+            var validationModelBase = Activator.CreateInstance(typeof(ValidationModelBase<>).MakeGenericType(validationType));
             if (validationModelBase is null) continue;
 
-            object? validator = null;
-            try
-            {
-                validator = validateMethod.Invoke(requestModel, new[] { validationModelBase });
-            }
-            catch
-            {
-                continue;
-            }
-
+            var validator = requestMethodInfo?.Invoke(requestModel, new[] { validationModelBase });
             if (validator is null) continue;
 
             var validatorInterface = validator.GetType()
-                .GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>));
-
+                .GetInterfaces().FirstOrDefault(m =>
+                    m.IsGenericType && m.GetGenericTypeDefinition() == typeof(IValidator<>));
             if (validatorInterface is null) continue;
 
             services.AddTransient(validatorInterface, _ => validator);
         }
 
         return services;
-    }
-
-    private static bool IsSkippableAssembly(Assembly a)
-    {
-        var name = a.FullName ?? string.Empty;
-        return a.IsDynamic
-               || name.StartsWith("DynamicProxyGenAssembly2", StringComparison.Ordinal) // Castle proxy
-               || name.StartsWith("Anonymously Hosted DynamicMethods", StringComparison.Ordinal);
     }
 
     private static IEnumerable<Type> SafeGetExportedTypes(Assembly asm)
@@ -99,15 +52,15 @@ public static class ApplicationServiceCollectionExtension
         }
         catch (ReflectionTypeLoadException ex)
         {
-            // Use the loadable subset
-            return ex.Types.Where(t => t != null)!;
+            return ex.Types.Where(t => t != null)!; // فقط تایپ‌هایی که لود شدن
         }
         catch
         {
-            // Skip problematic assemblies entirely
-            return Array.Empty<Type>();
+            return Array.Empty<Type>(); // اگه خطای دیگه بود، هیچی برنگردون
         }
     }
+
+
     public static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(cfg => { }, typeof(RegisterApplicationMappers).Assembly);
