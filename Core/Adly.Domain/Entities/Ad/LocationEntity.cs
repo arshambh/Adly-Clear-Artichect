@@ -1,4 +1,5 @@
 ﻿using Adly.Domain.Common;
+using Ardalis.GuardClauses;
 
 namespace Adly.Domain.Entities.Ad;
 
@@ -18,7 +19,13 @@ public sealed class LocationEntity : BaseEntity<Guid>
 
     private LocationEntity()
     {
-        
+
+    }
+
+    public void EditLocationName(string newLocationName)
+    {
+        Guard.Against.NullOrEmpty(newLocationName);
+        this.Name = newLocationName;
     }
 
 }

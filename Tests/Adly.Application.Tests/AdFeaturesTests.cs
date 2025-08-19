@@ -124,7 +124,7 @@ public class AdFeaturesTests
         locationMock.GetLocationByIdAsync(Arg.Any<Guid>())!
             .Returns(Task.FromResult(new LocationEntity("Test Location")));
 
-        adRepositoryMock.GetAdByIdAsync(mockId, default)!.Returns(Task.FromResult(adEntityMock));
+        adRepositoryMock.GetAdDetailByIdAsync(mockId, default)!.Returns(Task.FromResult(adEntityMock));
 
 
         fileServiceMock.SaveFilesAsync(Arg.Any<List<SaveFileModel>>())

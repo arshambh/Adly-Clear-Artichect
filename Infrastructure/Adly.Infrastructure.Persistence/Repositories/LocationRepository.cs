@@ -18,6 +18,11 @@ internal class LocationRepository(AdlyDbContext db):BaseRepository<LocationEntit
         return await base.TableAsNoTracking.FirstOrDefaultAsync(x => x.Id.Equals(locationId), cancellationToken);
     }
 
+    public async Task<LocationEntity?> GetLocationByIdForEditAsync(Guid locationId, CancellationToken cancellationToken = default)
+    {
+        return await base.Table.FirstOrDefaultAsync(x => x.Id.Equals(locationId), cancellationToken);
+    }
+
     public async Task<List<LocationEntity>> GetLocationByNameAsync(string locationName, CancellationToken cancellationToken = default)
     {
         return await base.TableAsNoTracking.Where(x => x.Name.Contains(locationName)).ToListAsync(cancellationToken);

@@ -27,7 +27,7 @@ public class EditAdCommandHandler(IUnitOfWork unitOfWork, IFileService fileServi
         }
 
 
-        var ad = await unitOfWork.AdRepository.GetAdByIdAsync(request.AdId, cancellationToken);
+        var ad = await unitOfWork.AdRepository.GetAdDetailByIdAsync(request.AdId, cancellationToken);
         if (ad == null)
             return OperationResult<bool>.FailureResult(nameof(EditAdCommand.AdId), "Ad not found.");
 
