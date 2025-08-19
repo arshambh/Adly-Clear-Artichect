@@ -104,7 +104,7 @@ public class UnitOfWorkTests(PersistenceTestSetup setup, ITestOutputHelper outpu
 
         newLocationById.ModifiedDate.Should().BeMoreThan(TimeSpan.MinValue);
 
-        outputHelper.WriteLine($"Current Modified Location Date {newLocationById.ModifiedDate}");
+        outputHelper.WriteLine($"Current Updated Location Date {newLocationById.ModifiedDate}");
 
     }
 
