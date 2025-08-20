@@ -9,7 +9,23 @@ public class ValidateRequestBehavior<TRequest, TResponse>(IValidator<TRequest> v
     where TRequest : IRequest<TResponse>
     where TResponse : IOperatorResult, new()
 {
-    public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
+    // public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
+    // {
+    //     var validationResult = await validator.ValidateAsync(message, cancellationToken);
+    //     if (!validationResult.IsValid)
+    //     {
+    //         return new TResponse()
+    //         {
+    //             IsNotFound = false,
+    //             IsSuccess = false,
+    //             ErrorMessages = validationResult.Errors.ConvertToKeyValuePair()
+    //         };
+    //     }
+    //     return await next(message, cancellationToken);
+    // }
+
+
+    public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
     {
         var validationResult = await validator.ValidateAsync(message, cancellationToken);
         if (!validationResult.IsValid)
@@ -21,6 +37,6 @@ public class ValidateRequestBehavior<TRequest, TResponse>(IValidator<TRequest> v
                 ErrorMessages = validationResult.Errors.ConvertToKeyValuePair()
             };
         }
-        return await next(message, cancellationToken);
+        return await next(message, cancellationToken); ;
     }
 }

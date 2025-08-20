@@ -1,11 +1,5 @@
-﻿using Adly.Infrastructure.Persistence.Configurations;
-using Adly.Infrastructure.Persistence.Repositories.Common;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using Testcontainers.MsSql;
-using Xunit;
-
-
+﻿using Adly.Application.Extensions;
+using Adly.Infrastructure.Persistence.Configurations;
 // namespace Adly.Infrastructure.Persistence.Tests;
 //
 //
@@ -65,8 +59,16 @@ using Xunit;
 
 using Adly.Infrastructure.Persistence.Configurations;
 using Adly.Infrastructure.Persistence.Repositories.Common;
+using Adly.Infrastructure.Persistence.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
+using Adly.Infrastructure.Persistence.Extensions;
 using Testcontainers.MsSql;
+using Testcontainers.MsSql;
+using Xunit;
 
 namespace Adly.Infrastructure.Persistence.Tests;
 
@@ -78,6 +80,7 @@ public class PersistenceTestSetup : IAsyncLifetime
         .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
         .Build();
 
+    public IServiceProvider ServiceProvider { get;private set; }
 
 
     public async Task InitializeAsync()
@@ -89,6 +92,29 @@ public class PersistenceTestSetup : IAsyncLifetime
         var db = new AdlyDbContext(dbOptionBuilder.Options);
         await db.Database.MigrateAsync();
         UnitOfWork = new UnitOfWork(db);
+
+
+        var configs = new Dictionary<string, string>()
+        {
+            { "ConnectionStrings:AdlyDb", _msSqlContainer.GetConnectionString() }
+        };
+
+        var configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.AddInMemoryCollection(configs!);
+
+
+
+
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddApplicationAutoMapper()
+            .AddApplicationMediatorServices()
+            .RegisterApplicationValidator()
+            .AddPersistenceDbContext(configurationBuilder.Build());
+
+        ServiceProvider = serviceCollection.BuildServiceProvider(false);
+
+
     }
 
     public async Task DisposeAsync()

@@ -57,8 +57,8 @@ public class LocationFeaturesTests
         // Act
         var createLocationResult = await validationBehavior.Handle(
             location,
-            default,
-            createLocationHandler.Handle);
+            createLocationHandler.Handle,
+            CancellationToken.None);
 
         // Assert
 
@@ -89,8 +89,8 @@ public class LocationFeaturesTests
         // Act
         var createLocationResult = await validationBehavior.Handle(
             location,
-            default,
-            createLocationHandler.Handle);
+            createLocationHandler.Handle,
+            CancellationToken.None);
 
         // Assert
         createLocationResult.Result.Should().BeFalse();
@@ -128,8 +128,8 @@ public class LocationFeaturesTests
         // Act
         var getLocationResult = await validationBehavior.Handle(
             location,
-            default,
-            getLocationByNameQueryHandler.Handle);
+            getLocationByNameQueryHandler.Handle,
+            CancellationToken.None);
 
         // Assert
         getLocationResult.Result.Should().NotBeEmpty();
@@ -166,8 +166,8 @@ public class LocationFeaturesTests
         // Act
         var getLocationResult = await validationBehavior.Handle(
             location,
-            default,
-            getLocationByNameQueryHandler.Handle);
+            getLocationByNameQueryHandler.Handle,
+            CancellationToken.None);
 
         // Assert
         getLocationResult.IsSuccess.Should().BeFalse();
@@ -202,8 +202,8 @@ public class LocationFeaturesTests
         // Act
         var createLocationResult = await validationBehavior.Handle(
             location,
-            default,
-            createLocationHandler.Handle);
+            createLocationHandler.Handle,
+            CancellationToken.None);
 
         // Assert
         createLocationResult.IsSuccess.Should().BeFalse();

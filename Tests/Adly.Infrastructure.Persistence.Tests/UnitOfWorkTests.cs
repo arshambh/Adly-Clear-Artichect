@@ -1,7 +1,11 @@
-﻿using Adly.Domain.Entities.Ad;
+﻿using Adly.Application.Feature.Location.Commands;
+using Adly.Application.Feature.Location.Queries;
+using Adly.Domain.Entities.Ad;
 using Adly.Infrastructure.Persistence.Configurations;
 using Adly.Infrastructure.Persistence.Repositories.Common;
 using FluentAssertions;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
 namespace Adly.Infrastructure.Persistence.Tests;
@@ -9,6 +13,7 @@ namespace Adly.Infrastructure.Persistence.Tests;
 public class UnitOfWorkTests(PersistenceTestSetup setup, ITestOutputHelper outputHelper) : IClassFixture<PersistenceTestSetup>
 {
     private readonly UnitOfWork _unitOfWork = setup.UnitOfWork;
+    private readonly IServiceProvider _serviceProvider = setup.ServiceProvider;
 
 
 
@@ -108,5 +113,22 @@ public class UnitOfWorkTests(PersistenceTestSetup setup, ITestOutputHelper outpu
 
     }
 
+    [Fact]
+    public async Task Adding_New_Location_By_Mediator_Should_Be_Success()
+    {
+        var sender = _serviceProvider.GetRequiredService<ISender>();
+        var addLocationResult = await sender.Send(new CreateLocationCommand("Test_Location_By_Mediator"));
+        addLocationResult.IsSuccess.Should().BeTrue();
+    }
+
+
+    [Fact]
+    public async Task Adding_New_Location_By_Mediator_Should_Persist_Data()
+    {
+        var sender = _serviceProvider.GetRequiredService<ISender>();
+        await sender.Send(new CreateLocationCommand("Test_Location_By_Mediator"));
+        var location = await sender.Send(new GetLocationByNameQuery("Test_Location_By_Mediator"));
+        location.Result.Should().NotBeEmpty();
+    }
 
 }

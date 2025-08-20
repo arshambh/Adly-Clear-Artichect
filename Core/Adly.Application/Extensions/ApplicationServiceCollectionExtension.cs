@@ -1,8 +1,13 @@
 ﻿using Adly.Application.Common.MappingConfigurations;
 using Adly.Application.Common.Validation;
+using Adly.Application.Feature.Common;
+using Adly.Application.Feature.Location.Commands;
 using FluentValidation;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.NetworkInformation;
 using System.Reflection;
+using Mediator;
 
 namespace Adly.Application.Extensions;
 
@@ -43,7 +48,6 @@ public static class ApplicationServiceCollectionExtension
 
         return services;
     }
-
     private static IEnumerable<Type> SafeGetExportedTypes(Assembly asm)
     {
         try
@@ -59,8 +63,6 @@ public static class ApplicationServiceCollectionExtension
             return Array.Empty<Type>(); // اگه خطای دیگه بود، هیچی برنگردون
         }
     }
-
-
     public static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(cfg => { }, typeof(RegisterApplicationMappers).Assembly);
@@ -71,5 +73,20 @@ public static class ApplicationServiceCollectionExtension
         services.AddLogging();
         return services;
     }
+
+    public static IServiceCollection AddApplicationMediatorServices(this IServiceCollection services)
+    {
+        services.AddMediator(options =>
+        {
+            options.ServiceLifetime = ServiceLifetime.Transient;
+            options.Namespace = "Adly.Application.GeneratedMediatorServices";
+        });
+
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidateRequestBehavior<,>));
+
+        return services;
+    }
+
+
 
 }

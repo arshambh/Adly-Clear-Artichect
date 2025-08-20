@@ -101,7 +101,7 @@ namespace Adly.Application.Tests
                 new ValidateRequestBehavior<RegisterUserCommand, OperationResult<bool>>(_serviceProvider.GetRequiredService<IValidator<RegisterUserCommand>>());
 
 
-            var userRegisterResult = await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
+            var userRegisterResult = await validationBehavior.Handle(registerUserRequest, userRegisterCommandHandler.Handle,CancellationToken.None);
 
 
             // Assert
@@ -139,7 +139,7 @@ namespace Adly.Application.Tests
                     _serviceProvider.GetRequiredService<IValidator<RegisterUserCommand>>());
 
             var userRegisterResult =
-                await validationBehavior.Handle(registerUserRequest, default, userRegisterCommandHandler.Handle);
+                await validationBehavior.Handle(registerUserRequest,  userRegisterCommandHandler.Handle,CancellationToken.None);
 
 
             // Assert
@@ -329,7 +329,7 @@ namespace Adly.Application.Tests
                 new ValidateRequestBehavior<UserPasswordLoginQuery, OperationResult<JwtAccessTokenModel>>(
                     _serviceProvider.GetRequiredService<IValidator<UserPasswordLoginQuery>>());
 
-            var loginResult = await validationBehavior.Handle(loginQuery, CancellationToken.None, userLoginQueryHandler.Handle);
+            var loginResult = await validationBehavior.Handle(loginQuery,  userLoginQueryHandler.Handle,CancellationToken.None);
 
             // Assert
             loginResult.Result.Should().BeNull();
