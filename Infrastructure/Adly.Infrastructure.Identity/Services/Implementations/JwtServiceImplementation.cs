@@ -24,6 +24,7 @@ internal class JwtServiceImplementation(IUserClaimsPrincipalFactory<UserEntity> 
         var signInCredential = new SigningCredentials(new SymmetricSecurityKey(secretKey)
             , SecurityAlgorithms.HmacSha256Signature);
 
+
         // var encryptionCredential = new EncryptingCredentials(
         //     new SymmetricSecurityKey(encryptionKey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256
         // );
