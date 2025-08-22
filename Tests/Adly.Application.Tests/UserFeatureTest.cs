@@ -163,7 +163,7 @@ namespace Adly.Application.Tests
 
 
             var userManager = NSubstitute.Substitute.For<IUserManager>();
-            userManager.GetUserByUsernameAsync(loginQuery.UsernameOrEmail, CancellationToken.None)
+            userManager.GetUserByUserNameAsync(loginQuery.UsernameOrEmail, CancellationToken.None)
                 .Returns(Task.FromResult<UserEntity?>(userEntity));
 
             userManager.ValidatePasswordAsync(userEntity, loginQuery.Password, CancellationToken.None)
@@ -199,7 +199,7 @@ namespace Adly.Application.Tests
 
 
             var userManager = NSubstitute.Substitute.For<IUserManager>();
-            userManager.GetUserByUsernameAsync(loginQuery.UsernameOrEmail, CancellationToken.None)
+            userManager.GetUserByUserNameAsync(loginQuery.UsernameOrEmail, CancellationToken.None)
                 .Returns(Task.FromResult<UserEntity?>(userEntity));
 
             userManager.ValidatePasswordAsync(userEntity, loginQuery.Password, CancellationToken.None)

@@ -19,7 +19,7 @@ public class UserPasswordLoginQueryHandler(IUserManager userManager,IJwtService 
 
         var user = request.UsernameOrEmail.IsEmail() ?
             await userManager.GetUserByEmailAsync(request.UsernameOrEmail, cancellationToken) :
-            await userManager.GetUserByUsernameAsync(request.UsernameOrEmail, cancellationToken);
+            await userManager.GetUserByUserNameAsync(request.UsernameOrEmail, cancellationToken);
 
         if (user is null)
         {
