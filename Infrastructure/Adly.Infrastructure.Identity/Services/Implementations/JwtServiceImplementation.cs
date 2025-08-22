@@ -25,9 +25,9 @@ internal class JwtServiceImplementation(IUserClaimsPrincipalFactory<UserEntity> 
             , SecurityAlgorithms.HmacSha256Signature);
 
 
-        // var encryptionCredential = new EncryptingCredentials(
-        //     new SymmetricSecurityKey(encryptionKey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256
-        // );
+        var encryptionCredential = new EncryptingCredentials(
+            new SymmetricSecurityKey(encryptionKey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256
+        );
 
         var descriptor = new SecurityTokenDescriptor()
         {
@@ -38,7 +38,7 @@ internal class JwtServiceImplementation(IUserClaimsPrincipalFactory<UserEntity> 
             Expires = DateTime.Now.AddMinutes(jwtConfiguration.Value.ExpirationMinute),
             SigningCredentials = signInCredential,
             Subject = new ClaimsIdentity(claims.Claims),
-            // EncryptingCredentials = encryptionCredential,
+            EncryptingCredentials = encryptionCredential,
             TokenType = "JWE"
         };
 
@@ -49,4 +49,6 @@ internal class JwtServiceImplementation(IUserClaimsPrincipalFactory<UserEntity> 
 
         return new JwtAccessTokenModel(tokenHandler.WriteToken(token), (token.ValidTo - DateTime.UtcNow).TotalSeconds);
     }
+
+
 }
